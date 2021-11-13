@@ -6,6 +6,22 @@ Aurthors:   Carter Edmond
 """
 import re
 import os
+import numpy as np
+import pandas as pd
+
+
+def split_train_test (files):
+    """Split the data into training and testing data
+    """
+    df = pd.DataFrame(files)
+    # approximate 9:1 ratio between training and test split
+    mask = np.random.rand(len(df)) <=.9
+    training_data = df[mask] #90% extracted
+    testing_data = df[~mask] #remaining 10% extracted
+
+    print(f"No. of training examples : {training_data.shape[0]}")
+    print(f"No. of testing examples: {testing_data.shape[0]}")
+
 
 def count_words(dir_path, word_dict):
     """Counts the total occurences of words given a text file path
