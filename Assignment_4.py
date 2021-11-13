@@ -4,7 +4,7 @@ Aurthors:   Carter Edmond
             Kengo Kobayashi
             Dustin Nguyen
 """
-
+import re
 import os
 
 def count_words(dir_path, word_dict):
@@ -16,14 +16,17 @@ def count_words(dir_path, word_dict):
     """
 
     text = str()
-
     for textfiles in os.listdir(dir_path):
         with open(os.path.join(dir_path, textfiles), 'r') as f:
             text += f.read()
 
+    chars = re.compile(r"[^a-zA-Z0-9-\s]")
+    text = chars.sub("",text)
     # Counts the word occurrneces line by line 
     words = text.split()
     for word in words:
+        if len(word) < 4:
+            continue
         if word in word_dict:
             word_dict[word] += 1
         else: 
@@ -43,7 +46,7 @@ if __name__ == '__main__':
     print(max(counts, key=counts.get))
 
     for key in counts.keys():
-        if(counts[key] < 50):
+        if(counts[key] < 1000):
             continue
         print(key+ ":\t" + str(counts[key]))
 
