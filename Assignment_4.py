@@ -14,23 +14,24 @@ def count_words(dir_path, word_dict):
     :param word_dict: Dictionary containing words and accumulated occurrences
     :return dict: Returns dictionary with updated word occurence values
     """
-    with os.scandir(dir_path) as paths:
-        lines = list()
-        for path in paths:
-            with open(path, 'r') as file:
-                lines = lines + [line.strip() for line in file]
-        
-    # Counts the word occurrneces line by line
-    for line in lines:
-        words = line.split()
-        for word in words:
-            if word in word_dict:
-                word_dict[word] += 1
-            else: 
-                word_dict[word] = 1
+
+    text = str()
+
+    for textfiles in os.listdir(dir_path):
+        with open(os.path.join(dir_path, textfiles), 'r') as f:
+            text += f.read()
+
+    # Counts the word occurrneces line by line 
+    words = text.split()
+    for word in words:
+        if word in word_dict:
+            word_dict[word] += 1
+        else: 
+            word_dict[word] = 1
     
     return word_dict
            
+
 
 # Main to test functionality of tokenizer counter
 if __name__ == '__main__':
