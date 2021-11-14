@@ -52,7 +52,7 @@ def count_words(df, word_dict, dir_path):
     # Counts the word occurrneces line by line 
     words = text.split()
     for word in words:
-        if len(word) < 4:
+        if len(word) < 5:
             continue
         if word in word_dict:
             word_dict[word] += 1
@@ -91,7 +91,7 @@ if __name__ == '__main__':
 
     # Calculates mutual independence of each attribute
     for word in pos_counts:
-        if word in(neg_counts.keys()):
+        if word in(neg_counts.keys()) and neg_counts[word] > 15:
             pos_occs = pos_counts[word]
             neg_occs = neg_counts[word]
             pos_mi = mutual_information(pos_occs, total_words, (pos_occs+neg_occs), pos_word_count)
