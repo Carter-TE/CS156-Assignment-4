@@ -1,0 +1,11 @@
+P1:'mulan'
+P2:'flynt' 
+P3:'lebowski'
+P4:'anna'
+P5'religion'
+
+N1:'ludicrous'
+N2:'flubber'
+N3;'magoo'
+N4:'jawbreaker'
+N5:'hudson'
