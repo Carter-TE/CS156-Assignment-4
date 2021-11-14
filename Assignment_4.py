@@ -11,8 +11,6 @@ import pandas as pd
 import math
 
 
-
-
 def split_train_test (folder_path):
     """Split the data into training and testing data
     """
@@ -28,7 +26,6 @@ def split_train_test (folder_path):
     print(f"No. of training examples : {training_data.shape[0]}")
     print(f"No. of testing examples: {testing_data.shape[0]}")
     return training_data, testing_data
-
 
 
 def count_words(df, word_dict, dir_path):
@@ -70,14 +67,16 @@ def mutual_information(a, b, c, d):
     return (math.log(first_part,2))
            
 
-
 # Main to test functionality of tokenizer counter
 if __name__ == '__main__':
-    pos_file_path = 'pos/'
-    neg_file_path = 'neg/'
+    pos_file_path = input("Input positive file path: ")
+    neg_file_path = input("Input negative file path: ")
+
+    # Splits data
     pos_train_data, pos_test_data = split_train_test(pos_file_path)     # data type: dataframe
     neg_train_data, neg_test_data = split_train_test(neg_file_path)
 
+    # Pre Processing
     pos_counts = dict()
     neg_counts = dict()
     pos_ev = dict() 
@@ -90,6 +89,7 @@ if __name__ == '__main__':
     neg_word_count = sum(neg_counts.values())
     total_words = neg_word_count + pos_word_count
 
+    # Calculates mutual independence of each attribute
     for word in pos_counts:
         if word in(neg_counts.keys()):
             pos_occs = pos_counts[word]
@@ -98,7 +98,6 @@ if __name__ == '__main__':
             neg_mi = mutual_information(neg_occs, total_words, (pos_occs+neg_occs), neg_word_count)
             pos_ev[pos_mi] = word 
             neg_ev[neg_mi] = word
-
 
     top_pos_ev = list()
     top_neg_ev = list()
