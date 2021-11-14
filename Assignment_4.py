@@ -39,6 +39,7 @@ def count_words(df, word_dict, dir_path):
     :return dict: Returns dictionary with updated word occurence values
     """
 
+    # Combines all text of files into single string
     text = str()
     for i in range(df.shape[0]):
         try:
@@ -46,9 +47,11 @@ def count_words(df, word_dict, dir_path):
                 text += f.read()
         except KeyError:
             continue
-
+    
+    # Parses text removing punctuation
     chars = re.compile(r"[^a-zA-Z0-9-\s]")
     text = chars.sub("",text)
+    
     # Counts the word occurrneces line by line 
     words = text.split()
     for word in words:
@@ -83,29 +86,35 @@ if __name__ == '__main__':
     pos_counts = count_words(pos_train_data, pos_counts, pos_file_path)
     neg_counts = count_words(neg_train_data, neg_counts, neg_file_path)
 
-    total_pos = sum(pos_counts.values())
-    total_neg = sum(neg_counts.values())
-    total_words = total_neg + total_pos
+    pos_word_count = sum(pos_counts.values())
+    neg_word_count = sum(neg_counts.values())
+    total_words = neg_word_count + pos_word_count
 
     for word in pos_counts:
         if word in(neg_counts.keys()):
             pos_occs = pos_counts[word]
             neg_occs = neg_counts[word]
-            pos_ev[word] = mutual_information(pos_occs, total_words, (pos_occs+neg_occs), total_pos)
-            neg_ev[word] = mutual_information(neg_occs, total_words, (pos_occs+neg_occs), total_neg)
+            pos_mi = mutual_information(pos_occs, total_words, (pos_occs+neg_occs), pos_word_count)
+            neg_mi = mutual_information(neg_occs, total_words, (pos_occs+neg_occs), neg_word_count)
+            pos_ev[pos_mi] = word 
+            neg_ev[neg_mi] = word
+
+
+    top_pos_ev = list()
+    top_neg_ev = list()
+    i=0
+    while i < 5:
+        top_pos_ev.append(pos_ev.pop(max(pos_ev.keys())))
+        top_neg_ev.append(neg_ev.pop(max(neg_ev.keys())))
+        i+=1
+    
+    print(top_pos_ev)
+    print(top_neg_ev)
 
             
     
 
 
-    """print(len(counts.keys()))
-    print(max(counts, key=counts.get))
-
-    for key in counts.keys():
-        if(counts[key] < 1000):
-            continue
-        print(key+ ":\t" + str(counts[key]))
-"""
     
     
 
