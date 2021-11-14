@@ -8,12 +8,18 @@ import re
 import os
 import numpy as np
 import pandas as pd
+import math
 
 
-def split_train_test (files):
+
+
+def split_train_test (folder_path):
     """Split the data into training and testing data
     """
-    df = pd.DataFrame(files)
+    files = os.listdir(os.path.abspath(folder_path))
+    file_names = list(filter(lambda file: file.endswith('.txt'), files))
+    
+    df = pd.DataFrame(file_names)
     # approximate 9:1 ratio between training and test split
     mask = np.random.rand(len(df)) <=.9
     training_data = df[mask] #90% extracted
@@ -21,9 +27,11 @@ def split_train_test (files):
 
     print(f"No. of training examples : {training_data.shape[0]}")
     print(f"No. of testing examples: {testing_data.shape[0]}")
+    return training_data, testing_data
 
 
-def count_words(dir_path, word_dict):
+
+def count_words(df, word_dict, dir_path):
     """Counts the total occurences of words given a text file path
     
     :param file_path: Path to text file location
@@ -32,9 +40,12 @@ def count_words(dir_path, word_dict):
     """
 
     text = str()
-    for textfiles in os.listdir(dir_path):
-        with open(os.path.join(dir_path, textfiles), 'r') as f:
-            text += f.read()
+    for i in range(df.shape[0]):
+        try:
+            with open(os.path.join(dir_path, df.at[i, 0]), 'r') as f:
+                text += f.read()
+        except KeyError:
+            continue
 
     chars = re.compile(r"[^a-zA-Z0-9-\s]")
     text = chars.sub("",text)
@@ -49,23 +60,52 @@ def count_words(dir_path, word_dict):
             word_dict[word] = 1
     
     return word_dict
+
+
+def mutual_information(a, b, c, d):
+    first_part = ((a*b)/(c*d))
+    return (math.log(first_part,2))
            
 
 
 # Main to test functionality of tokenizer counter
 if __name__ == '__main__':
-    file_path = 'pos/'
-    counts = dict()
-    counts = count_words(file_path, counts)
+    pos_file_path = 'pos/'
+    neg_file_path = 'neg/'
+    pos_train_data, pos_test_data = split_train_test(pos_file_path)     # data type: dataframe
+    neg_train_data, neg_test_data = split_train_test(neg_file_path)
 
-    print(len(counts.keys()))
+    pos_counts = dict()
+    neg_counts = dict()
+    pos_ev = dict() 
+    neg_ev = dict()
+
+    pos_counts = count_words(pos_train_data, pos_counts, pos_file_path)
+    neg_counts = count_words(neg_train_data, neg_counts, neg_file_path)
+
+    total_pos = sum(pos_counts.values())
+    total_neg = sum(neg_counts.values())
+    total_words = total_neg + total_pos
+
+    for word in pos_counts:
+        if word in(neg_counts.keys()):
+            pos_occs = pos_counts[word]
+            neg_occs = neg_counts[word]
+            pos_ev[word] = mutual_information(pos_occs, total_words, (pos_occs+neg_occs), total_pos)
+            neg_ev[word] = mutual_information(neg_occs, total_words, (pos_occs+neg_occs), total_neg)
+
+            
+    
+
+
+    """print(len(counts.keys()))
     print(max(counts, key=counts.get))
 
     for key in counts.keys():
         if(counts[key] < 1000):
             continue
         print(key+ ":\t" + str(counts[key]))
-
+"""
     
     
 
